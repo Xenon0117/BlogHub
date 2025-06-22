@@ -10,4 +10,8 @@ flask_sqlalchemy==3.1.1
 SQLAlchemy==2.0.25
 gunicorn==21.2.0
 psycopg2-binary==2.9.9
+<<<<<<< HEAD
 python-dotenv==1.1.0
+=======
+python-dotenv==1.1.0
+>>>>>>> 5c4ce7ca39d545f1e6b998fd8774b46d552c0c7f
