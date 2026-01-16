@@ -2,7 +2,7 @@ from datetime import date
 from flask import Flask, abort, render_template, redirect, url_for, flash,request
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
-from flask_gravatar import Gravatar
+# from flask_gravatar import Gravatar
 from flask_login import UserMixin, login_required, login_user, LoginManager, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
@@ -14,6 +14,8 @@ from forms import CreatePostForm,RegisterForm,LogInForm,CommentForm
 import smtplib
 from email.mime.text import MIMEText
 import os
+import hashlib
+from urllib.parse import urlencode
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -35,14 +37,19 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URI"]
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
-gravatar = Gravatar(app,
-                    size=100,
-                    rating='g',
-                    default='retro',
-                    force_default=False,
-                    force_lower=False,
-                    use_ssl=False,
-                    base_url=None)
+# Custom Gravatar function to replace Flask-Gravatar
+def gravatar_url(email, size=100, rating='g', default='retro', force_default=False):
+    hash_value = hashlib.md5(email.lower().encode('utf-8')).hexdigest()
+    query_params = {'s': str(size), 'd': default, 'r': rating}
+    if force_default:
+        query_params['f'] = 'y'
+    return f"https://www.gravatar.com/avatar/{hash_value}?{urlencode(query_params)}"
+
+gravatar = gravatar_url
+
+@app.context_processor
+def inject_gravatar():
+    return {'gravatar': gravatar_url}
 
 
 
